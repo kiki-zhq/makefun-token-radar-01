@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocols ranked by implied value</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">TOKEN RADAR &middot; DEFI LLAMA SNAPSHOT <span id="asOf">&mdash;</span></p>
+    <h1>Which launch is worth farming next?</h1>
+    <p class="sub">Every protocol below records no token yet. Each one is ranked by what its
+    launch would be worth if its record stayed as it is — and each row carries the
+    concrete steps to farm it before or after it issues one. This board predicts
+    nothing about whether or when a token is issued: the implied value is this
+    radar&rsquo;s own claim, never a promise.</p>
+    <dl class="stats">
+      <div><dt>Protocols scanned</dt><dd id="statScanned">&mdash;</dd></div>
+      <div><dt>Record no token</dt><dd id="statPre">&mdash;</dd></div>
+      <div><dt>Watchlist covered</dt><dd id="statWatch">&mdash;</dd></div>
+      <div><dt>Board rows</dt><dd id="statBoard">&mdash;</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="model" aria-label="How the value is worked out">
+    <h2>How the implied value is worked out <span class="model-tag" id="modelTag">model radar-2</span></h2>
+    <p>One formula scores every protocol — no name is ever special-cased. A token&rsquo;s
+    value grows with TVL, but with diminishing returns, so the multiple is a power law
+    in TVL; seven-day growth and how long the protocol has run with no token move it
+    up or down; running on more chains adds a little reach.</p>
+    <code class="formula">implied = TVL &times; clamp(0.60 &times; (TVL / $1M)<sup>&minus;0.15</sup>, 0.10, 0.60)
+      &times; (1 + clamp(7d change, &minus;70%, +200%) &times; 0.6)
+      &times; (0.55 + 0.45 &times; min(age, 4y) / 4y)
+      &times; (1 + 0.04 &times; extra chains, max 4)</code>
+    <p class="fine">Age is days from the day DefiLlama began tracking the protocol to the
+    snapshot date; a protocol with no tracking date counts as one year old. A missing
+    seven-day change counts as 0%.</p>
+  </section>
+
+  <section class="controls" aria-label="Filter and sort the board">
+    <label>Search <input id="q" type="search" placeholder="Name, slug or category&hellip;" autocomplete="off"></label>
+    <label>Category <select id="cat"><option value="">All categories</option></select></label>
+    <label>Chain <select id="chain"><option value="">All chains</option></select></label>
+    <label>Scope <select id="scope">
+      <option value="all">Whole board</option>
+      <option value="watchlist">Watchlist only ($50M+ floor)</option>
+      <option value="top50">Top 50 by implied value</option>
+    </select></label>
+    <label>Sort by <select id="sort">
+      <option value="value">Implied value, high to low</option>
+      <option value="tvl">TVL, high to low</option>
+      <option value="growth">7-day change, high to low</option>
+      <option value="age">Age, oldest first</option>
+      <option value="name">Name, A to Z</option>
+    </select></label>
+    <p class="count" id="count" aria-live="polite"></p>
+  </section>
+
+  <section aria-label="The board">
+    <table id="board">
+      <thead><tr>
+        <th class="num">#</th><th>Protocol</th><th>Category</th><th>Chains</th>
+        <th class="num">TVL</th><th class="num">7-day</th><th class="num">Age</th>
+        <th class="num">Implied value</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="hint">Click any row for its detail view: the model&rsquo;s breakdown and the five
+    farm steps, with what each step costs and how long it takes.</p>
+  </section>
+
+  <section id="detail" class="detail" aria-label="Protocol detail" hidden>
+    <div class="detail-head">
+      <div>
+        <h2 id="dName"></h2>
+        <p class="dmeta" id="dMeta"></p>
+      </div>
+      <button id="dClose" type="button" aria-label="Close detail">&times;</button>
+    </div>
+    <div class="detail-grid">
+      <div>
+        <h3>Why it ranks here</h3>
+        <table class="breakdown"><tbody id="dModel"></tbody></table>
+        <p class="fine" id="dNote"></p>
+      </div>
+      <div>
+        <h3>How to farm it</h3>
+        <ol class="steps" id="dSteps"></ol>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="Protocols whose token already trades">
+    <h2 class="section-title">Already trading — not ranked</h2>
+    <p class="sub">These protocols record a token with a market cap, so they are not launches
+    waiting to happen. They are shown apart from the board, by the market&rsquo;s own
+    values, never mixed into the ranking.</p>
+    <table id="live">
+      <thead><tr>
+        <th>Protocol</th><th>Category</th><th class="num">TVL</th>
+        <th class="num">Market cap</th><th class="num">7-day</th>
+      </tr></thead>
+      <tbody id="liveRows"></tbody>
+    </table>
+  </section>
+
+  <footer>
+    <p>Data: DefiLlama snapshot, sealed <span id="footDate">&mdash;</span>. Values are
+    this radar&rsquo;s own claims from that snapshot&rsquo;s figures — TVL, seven-day change,
+    age and chains — and say nothing about whether or when any protocol issues a token.
+    Farm steps are suggestions, not financial advice; check every protocol yourself
+    before you put money in.</p>
+  </footer>
+</main>
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
